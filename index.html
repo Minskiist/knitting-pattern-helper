@@ -395,6 +395,66 @@
       cursor: pointer; padding: 0.1rem 0.3rem; border-radius: 4px;
     }
     .welcome-close:hover { background: #e0d0dc; color: #5a3d56; opacity: 1; }
+    /* ── Smart calculator ── */
+    .calc-panel {
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .calc-panel h2 { margin-bottom: 0.4rem; color: #7a4f73; }
+    .calc-intro { font-size: 0.88rem; color: #666; margin-bottom: 1.25rem; line-height: 1.5; }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem 1rem;
+    }
+    .calc-grid .field { margin-bottom: 0; }
+    .calc-section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #9a7d95;
+      margin: 1.4rem 0 0.6rem;
+    }
+    .calc-results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .calc-result {
+      background: #f7f1f6;
+      border: 1px solid #e6d6e2;
+      border-radius: 10px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    .calc-result-label { font-size: 0.8rem; color: #6b5568; }
+    .calc-result-value {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #5a3d56;
+      margin-top: 0.15rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .calc-result-value.small { font-size: 1.05rem; padding-top: 0.3rem; }
+    .calc-total { margin-top: 0.9rem; font-size: 0.92rem; text-align: center; color: #444; }
+    .calc-note {
+      margin-top: 0.9rem;
+      font-size: 0.82rem;
+      color: #6b5568;
+      background: #f0eaf4;
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      line-height: 1.5;
+    }
+    @media (max-width: 420px) {
+      .setup-panel, .calc-panel { padding: 1.25rem; margin-left: 1rem; margin-right: 1rem; }
+      .calc-result-value { font-size: 1.2rem; }
+    }
   </style>
 </head>
 <body>
@@ -433,6 +493,58 @@
 
   <button class="btn-primary" onclick="loadForCalibration()">Next: Set chart area →</button>
 </div>
+
+<!-- ── Smart calculator ── -->
+<section class="calc-panel" id="calcPanel" aria-labelledby="calcTitle">
+  <h2 id="calcTitle">Älykäs laskin</h2>
+  <p class="calc-intro">Syötä neuletiheys ja tavoitemitat, niin laskin kertoo, montako silmukkaa ja kerrosta kaavioon tarvitaan.</p>
+
+  <div class="calc-section-title">Neuletiheys</div>
+  <div class="calc-grid">
+    <div class="field">
+      <label for="calcStGauge">Silmukkaa / 10 cm</label>
+      <input type="number" id="calcStGauge" min="1" step="0.5" value="22" inputmode="decimal">
+    </div>
+    <div class="field">
+      <label for="calcRowGauge">Kerrosta / 10 cm</label>
+      <input type="number" id="calcRowGauge" min="1" step="0.5" value="24" inputmode="decimal">
+    </div>
+  </div>
+
+  <div class="calc-section-title">Tavoitemitat</div>
+  <div class="calc-grid">
+    <div class="field">
+      <label for="calcWidth">Leveys (cm)</label>
+      <input type="number" id="calcWidth" min="1" step="0.5" value="40" inputmode="decimal">
+    </div>
+    <div class="field">
+      <label for="calcHeight">Korkeus (cm)</label>
+      <input type="number" id="calcHeight" min="1" step="0.5" value="35" inputmode="decimal">
+    </div>
+  </div>
+
+  <div class="calc-section-title">Tulokset</div>
+  <div class="calc-results" aria-live="polite">
+    <div class="calc-result">
+      <div class="calc-result-label">Silmukoita</div>
+      <div class="calc-result-value" id="calcStitches">–</div>
+    </div>
+    <div class="calc-result">
+      <div class="calc-result-label">Kerroksia</div>
+      <div class="calc-result-value" id="calcRows">–</div>
+    </div>
+    <div class="calc-result">
+      <div class="calc-result-label">Kaavion koko</div>
+      <div class="calc-result-value small" id="calcGridSize">–</div>
+    </div>
+    <div class="calc-result">
+      <div class="calc-result-label">Arvioitu koko</div>
+      <div class="calc-result-value small" id="calcRealSize">–</div>
+    </div>
+  </div>
+  <p class="calc-total" id="calcTotal"></p>
+  <p class="calc-note">Muista, että kirjoneule ja palmikot joustavat vähemmän kuin sileä neulos. Tee mallitilkku samalla tekniikalla, jolla aiot neuloa.</p>
+</section>
 
 <!-- ── Calibration panel ── -->
 <div class="calib-panel" id="calibPanel">
@@ -563,6 +675,7 @@
       calibImgEl.onload = () => {
         dismissWelcome();
         document.getElementById('setupPanel').style.display = 'none';
+        document.getElementById('calcPanel').style.display  = 'none';
         document.getElementById('calibPanel').style.display = 'flex';
         // Wait one frame so clientWidth/Height are available after layout
         requestAnimationFrame(() => {
@@ -735,6 +848,7 @@
     document.getElementById('viewer').style.display   = 'none';
     document.getElementById('calibPanel').style.display = 'none';
     document.getElementById('setupPanel').style.display = 'block';
+    document.getElementById('calcPanel').style.display  = 'block';
   }
 
   function backToCalib() {
@@ -913,6 +1027,50 @@
     const target  = rowTop - container.clientHeight / 2 + rowH / 2;
     container.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
   }
+
+  // ── Smart calculator ─────────────────────────────────────────────────────
+  // Gauge is given per 10 cm. Stitch and row counts are rounded to the
+  // nearest whole number; "Arvioitu koko" shows the real size those
+  // rounded counts produce.
+  const calcIds = ['calcStGauge', 'calcRowGauge', 'calcWidth', 'calcHeight'];
+  const fmtCm = n => n.toLocaleString('fi-FI', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const fmtInt = n => n.toLocaleString('fi-FI');
+
+  function readPositive(id) {
+    const v = parseFloat(String(document.getElementById(id).value).replace(',', '.'));
+    return Number.isFinite(v) && v > 0 ? v : null;
+  }
+
+  function calculateChart(stGauge, rowGauge, widthCm, heightCm) {
+    const stitches = Math.max(1, Math.round(stGauge / 10 * widthCm));
+    const rows     = Math.max(1, Math.round(rowGauge / 10 * heightCm));
+    return {
+      stitches,
+      rows,
+      realWidth:  stitches / (stGauge / 10),
+      realHeight: rows / (rowGauge / 10),
+      total: stitches * rows,
+    };
+  }
+
+  function updateCalculator() {
+    const [stG, rowG, w, h] = calcIds.map(readPositive);
+    const out = id => document.getElementById(id);
+    if ([stG, rowG, w, h].some(v => v === null)) {
+      ['calcStitches', 'calcRows', 'calcGridSize', 'calcRealSize'].forEach(id => out(id).textContent = '–');
+      out('calcTotal').textContent = 'Täytä kaikki kentät positiivisilla luvuilla.';
+      return;
+    }
+    const r = calculateChart(stG, rowG, w, h);
+    out('calcStitches').textContent = fmtInt(r.stitches);
+    out('calcRows').textContent     = fmtInt(r.rows);
+    out('calcGridSize').textContent = `${r.stitches} × ${r.rows}`;
+    out('calcRealSize').textContent = `${fmtCm(r.realWidth)} × ${fmtCm(r.realHeight)} cm`;
+    out('calcTotal').innerHTML = `Kaaviossa on noin <strong>${fmtInt(r.total)}</strong> neulottavaa silmukkaa.`;
+  }
+
+  calcIds.forEach(id => document.getElementById(id).addEventListener('input', updateCalculator));
+  updateCalculator();
 
   // ── Keyboard shortcuts ────────────────────────────────────────────────────
   document.addEventListener('keydown', e => {
