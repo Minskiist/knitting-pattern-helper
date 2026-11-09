@@ -507,6 +507,24 @@
       font-variant-numeric: tabular-nums;
     }
     .calc-result-value.small { font-size: 1.05rem; padding-top: 0.3rem; }
+    [hidden] { display: none !important; }
+    .calc-grid input::placeholder { color: #aaa; }
+    .calc-options { display: grid; gap: 0.8rem; margin-bottom: 0.9rem; }
+    .calc-option-label { font-size: 0.82rem; font-weight: 600; color: #5a3d56; margin-bottom: 0.35rem; }
+    .calc-option-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .calc-option {
+      background: white;
+      border: 2px solid #e0d0dc;
+      color: #444;
+      padding: 0.5rem 0.6rem;
+      text-align: left;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.35;
+    }
+    .calc-option strong { display: block; font-size: 1.05rem; color: #5a3d56; }
+    .calc-option.selected { border-color: #7a4f73; background: #f7f1f6; }
+    .calc-option.exact { grid-column: 1 / -1; }
     .calc-total { margin-top: 0.9rem; font-size: 0.92rem; text-align: center; color: #444; }
     .calc-note {
       margin-top: 0.9rem;
@@ -597,7 +615,40 @@
     </div>
   </div>
 
+  <div class="calc-section-title" data-i18n="calcPattern">Kuvio</div>
+  <div class="field">
+    <label data-i18n="calcMethod">Neulontatapa</label>
+    <div class="toggle-group">
+      <button type="button" class="toggle-btn active" id="btnRound" onclick="setKnitMethod('round')" data-i18n="methodRound">Suljettuna</button>
+      <button type="button" class="toggle-btn" id="btnFlat" onclick="setKnitMethod('flat')" data-i18n="methodFlat">Tasona</button>
+    </div>
+  </div>
+  <div class="calc-grid">
+    <div class="field">
+      <label for="calcStRepeat" data-i18n="calcStRepeatL">Kuviokerta (s)</label>
+      <input type="number" id="calcStRepeat" min="1" step="1" inputmode="numeric" data-i18n-placeholder="optional">
+    </div>
+    <div class="field">
+      <label for="calcRowRepeat" data-i18n="calcRowRepeatL">Kuviokerta (krs)</label>
+      <input type="number" id="calcRowRepeat" min="1" step="1" inputmode="numeric" data-i18n-placeholder="optional">
+    </div>
+    <div class="field" id="edgeField" hidden>
+      <label for="calcEdge" data-i18n="calcEdgeL">Reunasilmukat yhteensä</label>
+      <input type="number" id="calcEdge" min="0" step="1" value="2" inputmode="numeric">
+    </div>
+  </div>
+
   <div class="calc-section-title" data-i18n="calcResults">Tulokset</div>
+  <div class="calc-options" id="calcOptions" hidden>
+    <div class="calc-option-group" id="stOptionGroup">
+      <div class="calc-option-label" data-i18n="chooseStitches">Valitse silmukkamäärä</div>
+      <div class="calc-option-list" id="stOptions" role="radiogroup"></div>
+    </div>
+    <div class="calc-option-group" id="rowOptionGroup">
+      <div class="calc-option-label" data-i18n="chooseRows">Valitse kerrosmäärä</div>
+      <div class="calc-option-list" id="rowOptions" role="radiogroup"></div>
+    </div>
+  </div>
   <div class="calc-results" aria-live="polite">
     <div class="calc-result">
       <div class="calc-result-label" data-i18n="resStitches">Silmukoita</div>
@@ -1103,47 +1154,106 @@
   }
 
   // ── Smart calculator ─────────────────────────────────────────────────────
-  // Gauge is given per 10 cm. Stitch and row counts are rounded to the
-  // nearest whole number; "Arvioitu koko" shows the real size those
-  // rounded counts produce.
-  const calcIds = ['calcStGauge', 'calcRowGauge', 'calcWidth', 'calcHeight'];
+  // Gauge is given per 10 cm. Without a pattern repeat, counts are rounded
+  // to the nearest whole number. With a repeat, the two nearest counts that
+  // fit the repeat are offered and the knitter picks one:
+  //   stitches = k × stitch repeat (+ edge stitches when knitting flat)
+  //   rows     = m × row repeat
+  const calcIds = ['calcStGauge', 'calcRowGauge', 'calcWidth', 'calcHeight',
+                   'calcStRepeat', 'calcRowRepeat', 'calcEdge'];
   const fmtCm = n => n.toLocaleString(locale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const fmtInt = n => n.toLocaleString(locale());
 
-  function readPositive(id) {
+  let knitMethod = 'round';
+  let chosenSt = null;   // selected stitch count (null = closest)
+  let chosenRow = null;  // selected row count (null = closest)
+
+  function readNumber(id, { allowZero = false } = {}) {
     const v = parseFloat(String(document.getElementById(id).value).replace(',', '.'));
-    return Number.isFinite(v) && v > 0 ? v : null;
+    if (!Number.isFinite(v)) return null;
+    return (allowZero ? v >= 0 : v > 0) ? v : null;
   }
 
-  function calculateChart(stGauge, rowGauge, widthCm, heightCm) {
-    const stitches = Math.max(1, Math.round(stGauge / 10 * widthCm));
-    const rows     = Math.max(1, Math.round(rowGauge / 10 * heightCm));
-    return {
-      stitches,
-      rows,
-      realWidth:  stitches / (stGauge / 10),
-      realHeight: rows / (rowGauge / 10),
-      total: stitches * rows,
-    };
+  // Counts that fit `repeat` (+ `extra`) nearest to `target`.
+  // Returns 1 option when the target fits exactly, otherwise 2 (below/above).
+  function fitOptions(target, repeat, extra = 0) {
+    if (!repeat) return [{ count: Math.max(1, Math.round(target)), reps: null }];
+    const exact = (target - extra) / repeat;
+    const low = Math.max(1, Math.floor(exact + 1e-9));
+    if (Math.abs(exact - low) < 1e-9) return [{ count: low * repeat + extra, reps: low, exact: true }];
+    return [low, low + 1].map(k => ({ count: k * repeat + extra, reps: k }));
+  }
+
+  function closest(options, target) {
+    return options.reduce((best, o) =>
+      Math.abs(o.count - target) < Math.abs(best.count - target) ? o : best).count;
+  }
+
+  function setKnitMethod(method) {
+    knitMethod = method;
+    document.getElementById('btnRound').classList.toggle('active', method === 'round');
+    document.getElementById('btnFlat').classList.toggle('active',  method === 'flat');
+    document.getElementById('edgeField').hidden = method !== 'flat';
+    chosenSt = null;
+    updateCalculator();
+  }
+
+  function renderOptions(listId, options, selected, gaugePer10, onPick, edge = 0) {
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
+    options.forEach(o => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'calc-option' + (o.count === selected ? ' selected' : '') + (o.exact ? ' exact' : '');
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', o.count === selected);
+      let reps = t(o.reps === 1 ? 'repeatOne' : 'repeatMany').replace('{n}', fmtInt(o.reps));
+      if (edge > 0) reps += ' ' + t('plusEdge').replace('{n}', fmtInt(edge));
+      const cm = `${fmtCm(o.count / (gaugePer10 / 10))} cm`;
+      b.innerHTML = `<strong>${fmtInt(o.count)}</strong>${reps} · ${cm}${o.exact ? ' · ' + t('fitsExactly') : ''}`;
+      b.onclick = () => onPick(o.count);
+      list.appendChild(b);
+    });
   }
 
   function updateCalculator() {
-    const [stG, rowG, w, h] = calcIds.map(readPositive);
     const out = id => document.getElementById(id);
+    const stG = readNumber('calcStGauge'), rowG = readNumber('calcRowGauge');
+    const w = readNumber('calcWidth'), h = readNumber('calcHeight');
+    const stRep = readNumber('calcStRepeat'), rowRep = readNumber('calcRowRepeat');
+    const edge = knitMethod === 'flat' ? (readNumber('calcEdge', { allowZero: true }) || 0) : 0;
+
     if ([stG, rowG, w, h].some(v => v === null)) {
       ['calcStitches', 'calcRows', 'calcGridSize', 'calcRealSize'].forEach(id => out(id).textContent = '–');
       out('calcTotal').textContent = t('calcFillAll');
+      out('calcOptions').hidden = true;
       return;
     }
-    const r = calculateChart(stG, rowG, w, h);
-    out('calcStitches').textContent = fmtInt(r.stitches);
-    out('calcRows').textContent     = fmtInt(r.rows);
-    out('calcGridSize').textContent = `${r.stitches} × ${r.rows}`;
-    out('calcRealSize').textContent = `${fmtCm(r.realWidth)} × ${fmtCm(r.realHeight)} cm`;
-    out('calcTotal').innerHTML = t('calcTotal').replace('{n}', `<strong>${fmtInt(r.total)}</strong>`);
+
+    const stTarget = stG / 10 * w, rowTarget = rowG / 10 * h;
+    const stOpts  = fitOptions(stTarget, stRep ? Math.round(stRep) : null, Math.round(edge));
+    const rowOpts = fitOptions(rowTarget, rowRep ? Math.round(rowRep) : null);
+
+    if (!stOpts.some(o => o.count === chosenSt))  chosenSt  = closest(stOpts, stTarget);
+    if (!rowOpts.some(o => o.count === chosenRow)) chosenRow = closest(rowOpts, rowTarget);
+
+    out('calcOptions').hidden = !stRep && !rowRep;
+    out('stOptionGroup').hidden = !stRep;
+    out('rowOptionGroup').hidden = !rowRep;
+    if (stRep)  renderOptions('stOptions',  stOpts,  chosenSt,  stG,  c => { chosenSt = c;  updateCalculator(); }, Math.round(edge));
+    if (rowRep) renderOptions('rowOptions', rowOpts, chosenRow, rowG, c => { chosenRow = c; updateCalculator(); });
+
+    const stitches = chosenSt, rows = chosenRow;
+    out('calcStitches').textContent = fmtInt(stitches);
+    out('calcRows').textContent     = fmtInt(rows);
+    out('calcGridSize').textContent = `${stitches} × ${rows}`;
+    out('calcRealSize').textContent = `${fmtCm(stitches / (stG / 10))} × ${fmtCm(rows / (rowG / 10))} cm`;
+    out('calcTotal').innerHTML = t('calcTotal').replace('{n}', `<strong>${fmtInt(stitches * rows)}</strong>`);
   }
 
-  calcIds.forEach(id => document.getElementById(id).addEventListener('input', updateCalculator));
+  calcIds.forEach(id => document.getElementById(id).addEventListener('input', () => {
+    chosenSt = null; chosenRow = null; updateCalculator();
+  }));
 
   // ── Language (FI / EN) ───────────────────────────────────────────────────
   // Every visible text lives here. Add new strings to BOTH languages.
@@ -1196,6 +1306,20 @@
       resReal: 'Arvioitu koko',
       calcFillAll: 'Täytä kaikki kentät positiivisilla luvuilla.',
       calcTotal: 'Kaaviossa on noin {n} neulottavaa silmukkaa.',
+      calcPattern: 'Kuvio',
+      calcMethod: 'Neulontatapa',
+      methodRound: 'Suljettuna',
+      methodFlat: 'Tasona',
+      calcStRepeatL: 'Kuviokerta (s)',
+      calcRowRepeatL: 'Kuviokerta (krs)',
+      calcEdgeL: 'Reunasilmukat yhteensä',
+      optional: 'vapaaehtoinen',
+      chooseStitches: 'Valitse silmukkamäärä',
+      chooseRows: 'Valitse kerrosmäärä',
+      repeatOne: '{n} kuviokerta',
+      repeatMany: '{n} kuviokertaa',
+      fitsExactly: 'täsmää',
+      plusEdge: '+ {n} reunas.',
       calcNote: 'Muista, että kirjoneule ja palmikot joustavat vähemmän kuin sileä neulos. Tee mallitilkku samalla tekniikalla, jolla aiot neuloa.',
     },
     en: {
@@ -1246,6 +1370,20 @@
       resReal: 'Estimated size',
       calcFillAll: 'Fill in all fields with positive numbers.',
       calcTotal: 'This chart has about {n} stitches to knit.',
+      calcPattern: 'Pattern',
+      calcMethod: 'Knitting method',
+      methodRound: 'In the round',
+      methodFlat: 'Flat',
+      calcStRepeatL: 'Repeat (stitches)',
+      calcRowRepeatL: 'Repeat (rows)',
+      calcEdgeL: 'Edge stitches in total',
+      optional: 'optional',
+      chooseStitches: 'Choose stitch count',
+      chooseRows: 'Choose row count',
+      repeatOne: '{n} repeat',
+      repeatMany: '{n} repeats',
+      fitsExactly: 'exact fit',
+      plusEdge: '+ {n} edge',
       calcNote: 'Remember that colourwork and cables have less stretch than plain stockinette. Knit your swatch in the same technique you plan to use.',
     },
   };
@@ -1279,6 +1417,7 @@
     document.querySelectorAll('[data-i18n-html]').forEach(el => el.innerHTML = t(el.dataset.i18nHtml));
     document.querySelectorAll('[data-i18n-title]').forEach(el => el.title = t(el.dataset.i18nTitle));
     document.querySelectorAll('[data-i18n-alt]').forEach(el => el.alt = t(el.dataset.i18nAlt));
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = t(el.dataset.i18nPlaceholder));
     document.querySelectorAll('.lang-btn').forEach(b => {
       const on = b.dataset.lang === lang;
       b.classList.toggle('active', on);
