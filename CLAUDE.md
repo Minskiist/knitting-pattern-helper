@@ -18,4 +18,6 @@ Neulekaavioiden seuranta- ja (tulevaisuudessa) suunnittelutyökalu. Tekijä Minn
 - Jokainen muutos tehdään omassa haarassa (`feature/...` tai `fix/...`) ja yhdistetään pull requestin kautta.
 - Yksi ominaisuus kerrallaan. Viittaa issueen commit-viestissä (esim. `Closes #1`).
 - Ennen kuin ilmoitat valmiiksi: testaa, että seuranta-tila toimii yhä (kuvan lataus → rajaus → neulominen).
+- Tarkista myös, ettei sivulle synny vaakavieritystä (puhelin ~375 px ja leveä näyttö), ja että molemmat kielet toimivat.
+- Uudet tekstit lisätään `I18N`-sanakirjaan molemmille kielille, ei suoraan HTML:ään.
 - Käyttöliittymän kieli: suomi (nykyinen UI on englanniksi, käännös on backlogissa).
