@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Knitting Pattern Tracker</title>
+  <title data-i18n="appTitle">Knitting Pattern Tracker</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -19,7 +19,68 @@
       color: white;
       padding: 0.85rem 1.25rem;
     }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
     header h1 { font-size: 1.3rem; }
+
+    .lang-switch {
+      display: flex;
+      border: 1px solid rgba(255,255,255,0.45);
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .lang-btn {
+      background: transparent;
+      color: white;
+      border-radius: 0;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.03em;
+    }
+    .lang-btn.active { background: white; color: #7a4f73; opacity: 1; }
+
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .file-picker {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.45rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      min-width: 0;
+    }
+    .file-picker .file-btn {
+      display: inline-block;
+      margin: 0;
+      padding: 0.4rem 0.9rem;
+      background: #ecdce9;
+      color: #5a3d56;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .file-picker .file-btn:hover { opacity: 0.85; }
+    .file-picker:focus-within { border-color: #7a4f73; }
+    .file-name {
+      font-size: 0.9rem;
+      color: #666;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     /* ── Setup panel ── */
     .setup-panel {
@@ -460,114 +521,122 @@
 <body>
 
 <header>
-  <h1>Knitting Pattern Tracker</h1>
+  <h1 data-i18n="appTitle">Knitting Pattern Tracker</h1>
+  <div class="lang-switch" role="group" aria-label="Kieli / Language">
+    <button type="button" class="lang-btn" data-lang="fi" onclick="setLanguage('fi')">FI</button>
+    <button type="button" class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+  </div>
 </header>
 
 <!-- ── Welcome banner ── -->
 <div class="welcome" id="welcome">
-  <button class="welcome-close" onclick="dismissWelcome()" title="Dismiss">✕</button>
-  <strong>Welcome!</strong>
+  <button class="welcome-close" onclick="dismissWelcome()" data-i18n-title="dismiss" title="Dismiss">✕</button>
+  <strong data-i18n="welcomeTitle">Welcome!</strong>
   <ol>
-    <li>Upload your chart image and pick a row direction</li>
-    <li>Drag the blue box to cover the chart area and enter your row count</li>
-    <li>Use Next / Prev (or Space / Arrow keys) to follow along row by row</li>
+    <li data-i18n="welcome1">Upload your chart image and pick a row direction</li>
+    <li data-i18n="welcome2">Drag the blue box to cover the chart area and enter your row count</li>
+    <li data-i18n="welcome3">Use Next / Prev (or Space / Arrow keys) to follow along row by row</li>
   </ol>
 </div>
 
 <!-- ── Setup panel ── -->
 <div class="setup-panel" id="setupPanel">
-  <h2>Set up your pattern</h2>
+  <h2 data-i18n="setupTitle">Set up your pattern</h2>
 
   <div class="field">
-    <label for="imageInput">Chart image</label>
-    <input type="file" id="imageInput" accept="image/*">
-  </div>
-
-  <div class="field">
-    <label>Row direction</label>
-    <div class="toggle-group">
-      <button class="toggle-btn active" id="btnBottomUp" onclick="setDirection('bottom-up')">Bottom to top (standard)</button>
-      <button class="toggle-btn"        id="btnTopDown"  onclick="setDirection('top-down')">Top to bottom</button>
+    <label for="imageInput" data-i18n="chartImage">Chart image</label>
+    <div class="file-picker">
+      <input type="file" id="imageInput" accept="image/*" class="visually-hidden">
+      <label for="imageInput" class="file-btn" data-i18n="chooseFile">Choose file</label>
+      <span class="file-name" id="fileName" data-i18n="noFile">No file chosen</span>
     </div>
   </div>
 
-  <button class="btn-primary" onclick="loadForCalibration()">Next: Set chart area →</button>
+  <div class="field">
+    <label data-i18n="rowDirection">Row direction</label>
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="btnBottomUp" onclick="setDirection('bottom-up')" data-i18n="bottomUp">Bottom to top (standard)</button>
+      <button class="toggle-btn"        id="btnTopDown"  onclick="setDirection('top-down')" data-i18n="topDown">Top to bottom</button>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="loadForCalibration()" data-i18n="nextCalib">Next: Set chart area →</button>
 </div>
 
 <!-- ── Smart calculator ── -->
 <section class="calc-panel" id="calcPanel" aria-labelledby="calcTitle">
-  <h2 id="calcTitle">Älykäs laskin</h2>
-  <p class="calc-intro">Syötä neuletiheys ja tavoitemitat, niin laskin kertoo, montako silmukkaa ja kerrosta kaavioon tarvitaan.</p>
+  <h2 id="calcTitle" data-i18n="calcTitle">Älykäs laskin</h2>
+  <p class="calc-intro" data-i18n="calcIntro">Syötä neuletiheys ja tavoitemitat, niin laskin kertoo, montako silmukkaa ja kerrosta kaavioon tarvitaan.</p>
 
-  <div class="calc-section-title">Neuletiheys</div>
+  <div class="calc-section-title" data-i18n="calcGauge">Neuletiheys</div>
   <div class="calc-grid">
     <div class="field">
-      <label for="calcStGauge">Silmukkaa / 10 cm</label>
+      <label for="calcStGauge" data-i18n="calcStGaugeL">Silmukkaa / 10 cm</label>
       <input type="number" id="calcStGauge" min="1" step="0.5" value="22" inputmode="decimal">
     </div>
     <div class="field">
-      <label for="calcRowGauge">Kerrosta / 10 cm</label>
+      <label for="calcRowGauge" data-i18n="calcRowGaugeL">Kerrosta / 10 cm</label>
       <input type="number" id="calcRowGauge" min="1" step="0.5" value="24" inputmode="decimal">
     </div>
   </div>
 
-  <div class="calc-section-title">Tavoitemitat</div>
+  <div class="calc-section-title" data-i18n="calcTarget">Tavoitemitat</div>
   <div class="calc-grid">
     <div class="field">
-      <label for="calcWidth">Leveys (cm)</label>
+      <label for="calcWidth" data-i18n="calcWidthL">Leveys (cm)</label>
       <input type="number" id="calcWidth" min="1" step="0.5" value="40" inputmode="decimal">
     </div>
     <div class="field">
-      <label for="calcHeight">Korkeus (cm)</label>
+      <label for="calcHeight" data-i18n="calcHeightL">Korkeus (cm)</label>
       <input type="number" id="calcHeight" min="1" step="0.5" value="35" inputmode="decimal">
     </div>
   </div>
 
-  <div class="calc-section-title">Tulokset</div>
+  <div class="calc-section-title" data-i18n="calcResults">Tulokset</div>
   <div class="calc-results" aria-live="polite">
     <div class="calc-result">
-      <div class="calc-result-label">Silmukoita</div>
+      <div class="calc-result-label" data-i18n="resStitches">Silmukoita</div>
       <div class="calc-result-value" id="calcStitches">–</div>
     </div>
     <div class="calc-result">
-      <div class="calc-result-label">Kerroksia</div>
+      <div class="calc-result-label" data-i18n="resRows">Kerroksia</div>
       <div class="calc-result-value" id="calcRows">–</div>
     </div>
     <div class="calc-result">
-      <div class="calc-result-label">Kaavion koko</div>
+      <div class="calc-result-label" data-i18n="resGrid">Kaavion koko</div>
       <div class="calc-result-value small" id="calcGridSize">–</div>
     </div>
     <div class="calc-result">
-      <div class="calc-result-label">Arvioitu koko</div>
+      <div class="calc-result-label" data-i18n="resReal">Arvioitu koko</div>
       <div class="calc-result-value small" id="calcRealSize">–</div>
     </div>
   </div>
   <p class="calc-total" id="calcTotal"></p>
-  <p class="calc-note">Muista, että kirjoneule ja palmikot joustavat vähemmän kuin sileä neulos. Tee mallitilkku samalla tekniikalla, jolla aiot neuloa.</p>
+  <p class="calc-note" data-i18n="calcNote">Muista, että kirjoneule ja palmikot joustavat vähemmän kuin sileä neulos. Tee mallitilkku samalla tekniikalla, jolla aiot neuloa.</p>
 </section>
 
 <!-- ── Calibration panel ── -->
 <div class="calib-panel" id="calibPanel">
   <div class="calib-toolbar">
     <div class="calib-field">
-      <label for="calibRowCount">Rows:</label>
+      <label for="calibRowCount" data-i18n="rowsLabel">Rows:</label>
       <input type="number" id="calibRowCount" min="1" max="999" value="20" oninput="updateDividers()">
     </div>
     <div class="calib-field">
-      <label for="calibColCount">Stitches:</label>
+      <label for="calibColCount" data-i18n="stitchesLabel">Stitches:</label>
       <input type="number" id="calibColCount" min="1" max="999" value="10" oninput="updateDividers()">
     </div>
     <div class="calib-actions">
-      <button class="btn-small" onclick="backToSetup()">← Back</button>
-      <button class="btn-primary-sm" onclick="startKnitting()">Start Knitting →</button>
+      <button class="btn-small" onclick="backToSetup()" data-i18n="back">← Back</button>
+      <button class="btn-primary-sm" onclick="startKnitting()" data-i18n="startKnitting">Start Knitting →</button>
     </div>
   </div>
   <div class="calib-instructions">
     <div class="calib-steps">
-      <span class="calib-step"><span class="calib-step-num">1</span>Drag the blue box to cover the chart area</span>
-      <span class="calib-step"><span class="calib-step-num">2</span>Resize with the corner &amp; edge handles until it fits precisely</span>
-      <span class="calib-step"><span class="calib-step-num">3</span>Enter your row count and stitch count</span>
-      <span class="calib-step"><span class="calib-step-num">4</span>Click <strong>Start Knitting</strong> when you're ready!</span>
+      <span class="calib-step"><span class="calib-step-num">1</span><span data-i18n="calib1">Drag the blue box to cover the chart area</span></span>
+      <span class="calib-step"><span class="calib-step-num">2</span><span data-i18n="calib2">Resize with the corner &amp; edge handles until it fits precisely</span></span>
+      <span class="calib-step"><span class="calib-step-num">3</span><span data-i18n="calib3">Enter your row count and stitch count</span></span>
+      <span class="calib-step"><span class="calib-step-num">4</span><span data-i18n-html="calib4">Click <strong>Start Knitting</strong> when you're ready!</span></span>
     </div>
   </div>
   <div class="calib-image-area">
@@ -591,23 +660,23 @@
 <!-- ── Viewer ── -->
 <div class="viewer" id="viewer">
   <div class="toolbar">
-    <button class="btn-zoom" onclick="zoom(-0.25)" title="Zoom out (-)">−</button>
+    <button class="btn-zoom" onclick="zoom(-0.25)" data-i18n-title="zoomOut" title="Zoom out (-)">−</button>
     <span class="zoom-label" id="zoomLabel">100%</span>
-    <button class="btn-zoom" onclick="zoom(+0.25)" title="Zoom in (+)">+</button>
-    <button class="btn-small" onclick="resetZoom()">Fit width</button>
+    <button class="btn-zoom" onclick="zoom(+0.25)" data-i18n-title="zoomIn" title="Zoom in (+)">+</button>
+    <button class="btn-small" onclick="resetZoom()" data-i18n="fitWidth">Fit width</button>
     <div class="toolbar-sep"></div>
     <span class="row-info" id="rowInfo">Row 1 / 20</span>
     <div class="progress-wrap">
       <div class="progress-fill" id="progressFill" style="width:0%"></div>
     </div>
     <div class="toolbar-sep"></div>
-    <button class="btn-small" onclick="backToCalib()">Recalibrate</button>
-    <button class="btn-small" onclick="backToSetup()">Change chart</button>
+    <button class="btn-small" onclick="backToCalib()" data-i18n="recalibrate">Recalibrate</button>
+    <button class="btn-small" onclick="backToSetup()" data-i18n="changeChart">Change chart</button>
   </div>
 
   <div class="image-container" id="imageContainer">
     <div class="image-wrapper" id="imageWrapper">
-      <img id="chartImg" alt="Knitting chart">
+      <img id="chartImg" data-i18n-alt="chartAlt" alt="Knitting chart">
       <img id="chartImgSharp" alt="">
       <div class="highlight" id="highlight"></div>
       <canvas id="zoomCanvas"></canvas>
@@ -615,8 +684,8 @@
   </div>
 
   <div class="nav-bar">
-    <button class="btn-nav" id="btnPrev" onclick="prevRow()">← Prev</button>
-    <button class="btn-nav" id="btnNext" onclick="nextRow()">Next →</button>
+    <button class="btn-nav" id="btnPrev" onclick="prevRow()" data-i18n="prev">← Prev</button>
+    <button class="btn-nav" id="btnNext" onclick="nextRow()" data-i18n="next">Next →</button>
   </div>
 </div>
 
@@ -661,7 +730,7 @@
   // ── Setup → Calibration ──────────────────────────────────────────────────
   function loadForCalibration() {
     const file = document.getElementById('imageInput').files[0];
-    if (!file) { alert('Please choose a chart image first.'); return; }
+    if (!file) { alert(t('noFileAlert')); return; }
 
     const reader = new FileReader();
     reader.onload = e => {
@@ -910,7 +979,7 @@
     // Zoomed canvas overlay on active row
     drawZoomCanvas(areaLeft, areaTop, areaW, areaH, rowTop, rowH);
 
-    rowInfo.textContent      = `Row ${currentRow + 1} / ${totalRows}`;
+    rowInfo.textContent      = `${t('row')} ${currentRow + 1} / ${totalRows}`;
     progressFill.style.width = (currentRow / Math.max(totalRows - 1, 1) * 100) + '%';
     btnPrev.disabled = currentRow === 0;
     btnNext.disabled = currentRow === totalRows - 1;
@@ -1033,8 +1102,8 @@
   // nearest whole number; "Arvioitu koko" shows the real size those
   // rounded counts produce.
   const calcIds = ['calcStGauge', 'calcRowGauge', 'calcWidth', 'calcHeight'];
-  const fmtCm = n => n.toLocaleString('fi-FI', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  const fmtInt = n => n.toLocaleString('fi-FI');
+  const fmtCm = n => n.toLocaleString(locale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const fmtInt = n => n.toLocaleString(locale());
 
   function readPositive(id) {
     const v = parseFloat(String(document.getElementById(id).value).replace(',', '.'));
@@ -1058,7 +1127,7 @@
     const out = id => document.getElementById(id);
     if ([stG, rowG, w, h].some(v => v === null)) {
       ['calcStitches', 'calcRows', 'calcGridSize', 'calcRealSize'].forEach(id => out(id).textContent = '–');
-      out('calcTotal').textContent = 'Täytä kaikki kentät positiivisilla luvuilla.';
+      out('calcTotal').textContent = t('calcFillAll');
       return;
     }
     const r = calculateChart(stG, rowG, w, h);
@@ -1066,11 +1135,163 @@
     out('calcRows').textContent     = fmtInt(r.rows);
     out('calcGridSize').textContent = `${r.stitches} × ${r.rows}`;
     out('calcRealSize').textContent = `${fmtCm(r.realWidth)} × ${fmtCm(r.realHeight)} cm`;
-    out('calcTotal').innerHTML = `Kaaviossa on noin <strong>${fmtInt(r.total)}</strong> neulottavaa silmukkaa.`;
+    out('calcTotal').innerHTML = t('calcTotal').replace('{n}', `<strong>${fmtInt(r.total)}</strong>`);
   }
 
   calcIds.forEach(id => document.getElementById(id).addEventListener('input', updateCalculator));
-  updateCalculator();
+
+  // ── Language (FI / EN) ───────────────────────────────────────────────────
+  // Every visible text lives here. Add new strings to BOTH languages.
+  const I18N = {
+    fi: {
+      appTitle: 'Neulekaavioapuri',
+      dismiss: 'Sulje',
+      welcomeTitle: 'Tervetuloa!',
+      welcome1: 'Lataa kaavion kuva ja valitse neulontasuunta',
+      welcome2: 'Vedä sininen laatikko kaavion päälle ja anna kerrosten määrä',
+      welcome3: 'Etene kerros kerrallaan napeilla Seuraava / Edellinen (tai välilyönnillä ja nuolinäppäimillä)',
+      setupTitle: 'Lataa kaavio',
+      chartImage: 'Kaavion kuva',
+      chooseFile: 'Valitse kuva',
+      noFile: 'Ei valittua kuvaa',
+      rowDirection: 'Neulontasuunta',
+      bottomUp: 'Alhaalta ylös (tavallinen)',
+      topDown: 'Ylhäältä alas',
+      nextCalib: 'Seuraavaksi: rajaa kaavio →',
+      noFileAlert: 'Valitse ensin kaavion kuva.',
+      rowsLabel: 'Kerroksia:',
+      stitchesLabel: 'Silmukoita:',
+      back: '← Takaisin',
+      startKnitting: 'Aloita neulominen →',
+      calib1: 'Vedä sininen laatikko kaavioalueen päälle',
+      calib2: 'Säädä kokoa kulmista ja reunoista, kunnes se osuu tarkasti',
+      calib3: 'Anna kerrosten ja silmukoiden määrä',
+      calib4: 'Paina <strong>Aloita neulominen</strong>, kun olet valmis!',
+      zoomOut: 'Loitonna (-)',
+      zoomIn: 'Lähennä (+)',
+      fitWidth: 'Sovita leveyteen',
+      row: 'Kerros',
+      recalibrate: 'Rajaa uudelleen',
+      changeChart: 'Vaihda kaavio',
+      chartAlt: 'Neulekaavio',
+      prev: '← Edellinen',
+      next: 'Seuraava →',
+      calcTitle: 'Älykäs laskin',
+      calcIntro: 'Syötä neuletiheys ja tavoitemitat, niin laskin kertoo, montako silmukkaa ja kerrosta kaavioon tarvitaan.',
+      calcGauge: 'Neuletiheys',
+      calcTarget: 'Tavoitemitat',
+      calcResults: 'Tulokset',
+      calcStGaugeL: 'Silmukkaa / 10 cm',
+      calcRowGaugeL: 'Kerrosta / 10 cm',
+      calcWidthL: 'Leveys (cm)',
+      calcHeightL: 'Korkeus (cm)',
+      resStitches: 'Silmukoita',
+      resRows: 'Kerroksia',
+      resGrid: 'Kaavion koko',
+      resReal: 'Arvioitu koko',
+      calcFillAll: 'Täytä kaikki kentät positiivisilla luvuilla.',
+      calcTotal: 'Kaaviossa on noin {n} neulottavaa silmukkaa.',
+      calcNote: 'Muista, että kirjoneule ja palmikot joustavat vähemmän kuin sileä neulos. Tee mallitilkku samalla tekniikalla, jolla aiot neuloa.',
+    },
+    en: {
+      appTitle: 'Knitting Pattern Helper',
+      dismiss: 'Dismiss',
+      welcomeTitle: 'Welcome!',
+      welcome1: 'Upload your chart image and pick a row direction',
+      welcome2: 'Drag the blue box to cover the chart area and enter your row count',
+      welcome3: 'Use Next / Prev (or Space / Arrow keys) to follow along row by row',
+      setupTitle: 'Set up your pattern',
+      chartImage: 'Chart image',
+      chooseFile: 'Choose image',
+      noFile: 'No image chosen',
+      rowDirection: 'Row direction',
+      bottomUp: 'Bottom to top (standard)',
+      topDown: 'Top to bottom',
+      nextCalib: 'Next: Set chart area →',
+      noFileAlert: 'Please choose a chart image first.',
+      rowsLabel: 'Rows:',
+      stitchesLabel: 'Stitches:',
+      back: '← Back',
+      startKnitting: 'Start knitting →',
+      calib1: 'Drag the blue box to cover the chart area',
+      calib2: 'Resize with the corner & edge handles until it fits precisely',
+      calib3: 'Enter your row count and stitch count',
+      calib4: 'Click <strong>Start knitting</strong> when you\'re ready!',
+      zoomOut: 'Zoom out (-)',
+      zoomIn: 'Zoom in (+)',
+      fitWidth: 'Fit width',
+      row: 'Row',
+      recalibrate: 'Recalibrate',
+      changeChart: 'Change chart',
+      chartAlt: 'Knitting chart',
+      prev: '← Prev',
+      next: 'Next →',
+      calcTitle: 'Smart calculator',
+      calcIntro: 'Enter your gauge and target measurements to see how many stitches and rows your chart needs.',
+      calcGauge: 'Gauge',
+      calcTarget: 'Target size',
+      calcResults: 'Results',
+      calcStGaugeL: 'Stitches / 10 cm',
+      calcRowGaugeL: 'Rows / 10 cm',
+      calcWidthL: 'Width (cm)',
+      calcHeightL: 'Height (cm)',
+      resStitches: 'Stitches',
+      resRows: 'Rows',
+      resGrid: 'Chart size',
+      resReal: 'Estimated size',
+      calcFillAll: 'Fill in all fields with positive numbers.',
+      calcTotal: 'This chart has about {n} stitches to knit.',
+      calcNote: 'Remember that colourwork and cables have less stretch than plain stockinette. Knit your swatch in the same technique you plan to use.',
+    },
+  };
+
+  let lang = 'fi';
+  const t = key => (I18N[lang] && I18N[lang][key]) ?? I18N.en[key] ?? key;
+  const locale = () => (lang === 'fi' ? 'fi-FI' : 'en-GB');
+
+  function detectLanguage() {
+    try {
+      const saved = localStorage.getItem('kph-lang');
+      if (saved && I18N[saved]) return saved;
+    } catch (e) { /* storage unavailable */ }
+    const nav = (navigator.language || 'en').toLowerCase();
+    return nav.startsWith('fi') ? 'fi' : 'en';
+  }
+
+  function setLanguage(newLang) {
+    if (!I18N[newLang]) return;
+    lang = newLang;
+    try { localStorage.setItem('kph-lang', newLang); } catch (e) { /* ignore */ }
+    applyTranslations();
+  }
+
+  function applyTranslations() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      if (el.id === 'fileName' && el.dataset.hasFile) return;
+      el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => el.innerHTML = t(el.dataset.i18nHtml));
+    document.querySelectorAll('[data-i18n-title]').forEach(el => el.title = t(el.dataset.i18nTitle));
+    document.querySelectorAll('[data-i18n-alt]').forEach(el => el.alt = t(el.dataset.i18nAlt));
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      const on = b.dataset.lang === lang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on);
+    });
+    updateCalculator();
+    if (document.getElementById('viewer').style.display === 'flex') updateHighlight();
+  }
+
+  document.getElementById('imageInput').addEventListener('change', e => {
+    const el = document.getElementById('fileName');
+    const file = e.target.files[0];
+    if (file) { el.textContent = file.name; el.dataset.hasFile = '1'; }
+    else { delete el.dataset.hasFile; el.textContent = t('noFile'); }
+  });
+
+  lang = detectLanguage();
+  applyTranslations();
 
   // ── Keyboard shortcuts ────────────────────────────────────────────────────
   document.addEventListener('keydown', e => {
