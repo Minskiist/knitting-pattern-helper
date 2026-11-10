@@ -4,9 +4,20 @@
 Neulekaavioiden seuranta- ja (tulevaisuudessa) suunnittelutyökalu. Tekijä Minna Purkunen on kokenut neuloja, joten neulontaan liittyvät tiedot tulevat häneltä. Kysy, jos neulontakäytäntö on epäselvä, äläkä arvaa.
 
 ## Tekninen rakenne
-- Yksi tiedosto: `index.html` (HTML + CSS + vanilla JS). Ei frameworkeja, ei build-vaihetta.
-- Julkaisu: Netlify.
-- Pidä rakenne yksinkertaisena. Jos tiedosto kasvaa liian suureksi, ehdota jakoa ennen kuin teet sen.
+Kaksi välilehteä: **Neulo** (valmiin kaavion seuranta) ja **Suunnittele** (laskin, tuleva editori).
+
+```
+index.html          HTML-rakenne (ei tyylejä eikä skriptejä)
+css/styles.css      kaikki tyylit
+js/i18n.js          I18N-sanakirja (FI + EN), t(), kielivalinta
+js/tracker.js       Neulo: lataus, rajaus, seuranta, näppäinkomennot
+js/calculator.js    Suunnittele: älykäs laskin
+js/app.js           välilehdet ja käynnistys (ladataan viimeisenä)
+```
+
+- Vanilla JS tavallisina `<script>`-tiedostoina (ei moduuleja, ei frameworkeja, ei build-vaihetta). Tiedostot jakavat globaalit muuttujat, joten latausjärjestys `index.html`:ssä on tärkeä.
+- Uusi iso osa (esim. editori) saa oman tiedostonsa `js/`-kansioon.
+- Julkaisu: Netlify julkaisee `main`-haaran automaattisesti, ja jokaisesta PR:stä tulee Deploy Preview.
 
 ## Neulontakäytännöt (tärkeät)
 - Kaaviota luetaan oletuksena **alhaalta ylös** ja **oikealta vasemmalle**. Numerointi noudattaa samaa.
@@ -20,4 +31,4 @@ Neulekaavioiden seuranta- ja (tulevaisuudessa) suunnittelutyökalu. Tekijä Minn
 - Ennen kuin ilmoitat valmiiksi: testaa, että seuranta-tila toimii yhä (kuvan lataus → rajaus → neulominen).
 - Tarkista myös, ettei sivulle synny vaakavieritystä (puhelin ~375 px ja leveä näyttö), ja että molemmat kielet toimivat.
 - Uudet tekstit lisätään `I18N`-sanakirjaan molemmille kielille, ei suoraan HTML:ään.
-- Käyttöliittymän kieli: suomi (nykyinen UI on englanniksi, käännös on backlogissa).
+- Käyttöliittymä on kaksikielinen (FI / EN). Suomenkielinen termistö: *kerros* (ei rivi), *suljettuna / tasona*, *kuviokerta*.

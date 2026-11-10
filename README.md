@@ -1,6 +1,6 @@
 # Knitting Pattern Helper 🧶
 
-Selainsovellus neulekaavion seuraamiseen: lataa kaavion kuva, rajaa kaavioalue ja neulo rivi kerrallaan. Aktiivinen rivi korostuu, ja silmukat erottuvat apuruudukon avulla.
+Selainsovellus neulekaavion seuraamiseen ja suunnitteluun. **Neulo**-välilehdellä lataa kaavion kuva, rajaa kaavioalue ja neulo kerros kerrallaan. Aktiivinen kerros korostuu, ja silmukat erottuvat apuruudukon avulla. **Suunnittele**-välilehden laskin mitoittaa kaavion neuletiheyden, tavoitemittojen ja kuviokerran mukaan.
 
 **Live:** https://knitting-pattern-helper.netlify.app/
 
@@ -12,6 +12,6 @@ Selainsovellus neulekaavion seuraamiseen: lataa kaavion kuva, rajaa kaavioalue j
 
 ## Kehitys
 
-Projekti on yksi tiedosto, `index.html`, eikä siinä ole build-vaihetta. Avaa tiedosto selaimessa, niin sovellus toimii.
+Ei build-vaihetta: avaa `index.html` selaimessa, niin sovellus toimii. Koodi on jaettu tiedostoihin `css/` ja `js/` -kansioissa; rakenne on kuvattu tiedostossa [CLAUDE.md](CLAUDE.md).
 
 Suunnitellut ominaisuudet löytyvät tiedostosta [BACKLOG.md](BACKLOG.md) ja GitHub Issuesista.
