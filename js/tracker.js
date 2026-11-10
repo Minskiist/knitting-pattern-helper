@@ -31,6 +31,11 @@ function dismissWelcome() {
   document.getElementById('welcome').style.display = 'none';
 }
 
+// The intro heading belongs to the start view only
+function showKnitIntro(show) {
+  document.getElementById('knitIntro').hidden = !show;
+}
+
 // ── Direction ────────────────────────────────────────────────────────────
 function setDirection(dir) {
   direction = dir;
@@ -54,6 +59,7 @@ function loadForCalibration() {
     const calibImgEl = document.getElementById('calibImg');
     calibImgEl.onload = () => {
       dismissWelcome();
+      showKnitIntro(false);
       document.getElementById('setupPanel').style.display = 'none';
         document.getElementById('calibPanel').style.display = 'flex';
       // Wait one frame so clientWidth/Height are available after layout
@@ -227,6 +233,7 @@ function backToSetup() {
   document.getElementById('viewer').style.display   = 'none';
   document.getElementById('calibPanel').style.display = 'none';
   document.getElementById('setupPanel').style.display = 'block';
+  showKnitIntro(true);
 }
 
 function backToCalib() {
