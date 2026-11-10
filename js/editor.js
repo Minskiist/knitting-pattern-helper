@@ -89,17 +89,23 @@ function computeCellSize() {
 function drawEditor() {
   if (!editor.cells) return;
   const cs = editor.cell = computeCellSize();
-  const { cols, rows, cells } = editor;
-  const gw = cols * cs, gh = rows * cs;
-  const W = gw + ED_NUM_RIGHT, H = gh + ED_NUM_BOTTOM;
+  const W = editor.cols * cs + ED_NUM_RIGHT, H = editor.rows * cs + ED_NUM_BOTTOM;
   const dpr = window.devicePixelRatio || 1;
   edCanvas.width = W * dpr;
   edCanvas.height = H * dpr;
   edCanvas.style.width = W + 'px';
   edCanvas.style.height = H + 'px';
-  const ctx = edCtx;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, W, H);
+  edCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  edCtx.clearRect(0, 0, W, H);
+  renderChart(edCtx, cs);
+  if (typeof scheduleAutosave === 'function') scheduleAutosave();
+}
+
+// Draws the chart (cells, grid lines, numbers) with its top-left corner at 0,0.
+// Shared by the on-screen editor and the PNG export.
+function renderChart(ctx, cs) {
+  const { cols, rows, cells } = editor;
+  const gw = cols * cs, gh = rows * cs;
 
   // Cells
   for (let r = 0; r < rows; r++) {
@@ -279,6 +285,7 @@ function updateEditorUI() {
   document.getElementById('edUndo').disabled = editor.history.length === 0;
   const size = document.getElementById('edSizeInfo');
   size.textContent = editor.cells ? t('edSizeInfo').replace('{s}', editor.cols).replace('{r}', editor.rows) : '';
+  if (typeof setSaveStatus === 'function') setSaveStatus(saveStatusKey);
   const btn = document.getElementById('calcMakeChart');
   if (btn) btn.disabled = chosenSt == null || chosenRow == null;
 }

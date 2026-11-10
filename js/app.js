@@ -33,6 +33,7 @@ window.addEventListener('resize', updateHeaderHeight);
 // ── Start ───────────────────────────────────────────────────────────────────
 lang = detectLanguage();
 applyTranslations();
+restoreAutosave();
 let savedTab = 'knit';
 try { savedTab = localStorage.getItem('kph-tab') || 'knit'; } catch (e) { /* ignore */ }
 setTab(savedTab);
