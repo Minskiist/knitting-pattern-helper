@@ -4,7 +4,7 @@
 Neulekaavioiden seuranta- ja (tulevaisuudessa) suunnittelutyökalu. Tekijä Minna Purkunen on kokenut neuloja, joten neulontaan liittyvät tiedot tulevat häneltä. Kysy, jos neulontakäytäntö on epäselvä, äläkä arvaa.
 
 ## Tekninen rakenne
-Kaksi välilehteä: **Neulo** (valmiin kaavion seuranta) ja **Suunnittele** (laskin, tuleva editori).
+Kaksi välilehteä: **Neulo** (valmiin kaavion seuranta) ja **Suunnittele** (laskin ja kaavioeditori).
 
 ```
 index.html          HTML-rakenne (ei tyylejä eikä skriptejä)
@@ -12,11 +12,13 @@ css/styles.css      kaikki tyylit
 js/i18n.js          I18N-sanakirja (FI + EN), t(), kielivalinta
 js/tracker.js       Neulo: lataus, rajaus, seuranta, näppäinkomennot
 js/calculator.js    Suunnittele: älykäs laskin
+js/editor.js        Suunnittele: kaavioeditori (canvas, värit, maalaus, täyttö, kumoa)
 js/app.js           välilehdet ja käynnistys (ladataan viimeisenä)
 ```
 
 - Vanilla JS tavallisina `<script>`-tiedostoina (ei moduuleja, ei frameworkeja, ei build-vaihetta). Tiedostot jakavat globaalit muuttujat, joten latausjärjestys `index.html`:ssä on tärkeä.
-- Uusi iso osa (esim. editori) saa oman tiedostonsa `js/`-kansioon.
+- Uusi iso osa saa oman tiedostonsa `js/`-kansioon.
+- Editorin data: `editor.cells[kerros * silmukat + silmukka]`, jossa silmukka 0 on **oikeanpuoleisin** ja kerros 0 **alin**. Piirrettäessä koordinaatit käännetään.
 - Julkaisu: Netlify julkaisee `main`-haaran automaattisesti, ja jokaisesta PR:stä tulee Deploy Preview.
 
 ## Neulontakäytännöt (tärkeät)
