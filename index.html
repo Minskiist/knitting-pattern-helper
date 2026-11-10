@@ -61,6 +61,7 @@
   </div>
 
   <button class="btn-primary" onclick="loadForCalibration()" data-i18n="nextCalib">Next: Set chart area →</button>
+  <button type="button" class="btn-small resume-btn" id="resumeBtn" onclick="resumeFromButton()" hidden></button>
 </div>
 
 <!-- ── Calibration panel ── -->
@@ -68,11 +69,11 @@
   <div class="calib-toolbar">
     <div class="calib-field">
       <label for="calibRowCount" data-i18n="rowsLabel">Rows:</label>
-      <input type="number" id="calibRowCount" min="1" max="999" value="20" oninput="updateDividers()">
+      <input type="number" id="calibRowCount" min="1" max="999" value="20" oninput="updateDividers(); saveCalibDraft()">
     </div>
     <div class="calib-field">
       <label for="calibColCount" data-i18n="stitchesLabel">Stitches:</label>
-      <input type="number" id="calibColCount" min="1" max="999" value="10" oninput="updateDividers()">
+      <input type="number" id="calibColCount" min="1" max="999" value="10" oninput="updateDividers(); saveCalibDraft()">
     </div>
     <div class="calib-actions">
       <button class="btn-small" onclick="backToSetup()" data-i18n="back">← Back</button>
@@ -286,6 +287,7 @@
 
 <script src="js/i18n.js"></script>
 <script src="js/tracker.js"></script>
+<script src="js/tracker-session.js"></script>
 <script src="js/calculator.js"></script>
 <script src="js/editor.js"></script>
 <script src="js/chart-file.js"></script>

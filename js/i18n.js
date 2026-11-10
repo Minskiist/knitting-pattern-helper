@@ -52,6 +52,7 @@ const I18N = {
     topDown: 'Ylhäältä alas',
     nextCalib: 'Seuraavaksi: rajaa kaavio →',
     noFileAlert: 'Valitse ensin kaavion kuva.',
+    resumeChart: '↺ Jatka edellistä kaaviota: {name}',
     rowsLabel: 'Kerroksia:',
     stitchesLabel: 'Silmukoita:',
     back: '← Takaisin',
@@ -148,6 +149,7 @@ const I18N = {
     topDown: 'Top to bottom',
     nextCalib: 'Next: Set chart area →',
     noFileAlert: 'Please choose a chart image first.',
+    resumeChart: '↺ Continue previous chart: {name}',
     rowsLabel: 'Rows:',
     stitchesLabel: 'Stitches:',
     back: '← Back',
@@ -236,6 +238,7 @@ function applyTranslations() {
   updateCalculator();
   updateEditorUI();
   if (document.getElementById('viewer').style.display === 'flex') updateHighlight();
+  updateResumeButton();
 }
 
 

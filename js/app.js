@@ -17,7 +17,7 @@ function setTab(tab) {
   try { localStorage.setItem('kph-tab', tab); } catch (e) { /* ignore */ }
   updateHeaderHeight();
   // The tracker measures the image, so refresh it when it becomes visible again
-  if (tab === 'knit' && document.getElementById('viewer').style.display === 'flex') updateHighlight();
+  if (tab === 'knit') refreshTrackerView();
   // The editor canvas sizes itself to its container, which has no width while hidden
   if (tab === 'design') drawEditor();
 }
