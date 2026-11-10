@@ -56,14 +56,25 @@ function loadChart(chart) {
 }
 
 // ── Autosave (this browser only) ────────────────────────────────────────────
+// Changes are saved shortly after drawing, and immediately when a stroke
+// ends or the page is hidden / closed (reload, tab close, app switch on a
+// phone) – otherwise the very last change could be lost.
 let autosaveTimer = null;
+let autosavePending = false;
 
 function scheduleAutosave() {
+  autosavePending = true;
   clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(autosaveNow, 400);
+  autosaveTimer = setTimeout(autosaveNow, 300);
+}
+
+function flushAutosave() {
+  if (autosavePending) autosaveNow();
 }
 
 function autosaveNow() {
+  clearTimeout(autosaveTimer);
+  autosavePending = false;
   if (!editor.cells) return;
   try {
     localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(chartToData()));
@@ -93,6 +104,13 @@ function setSaveStatus(key) {
   const el = document.getElementById('edSaveStatus');
   if (el) el.textContent = key ? t(key) : '';
 }
+
+edCanvas.addEventListener('pointerup', flushAutosave);
+window.addEventListener('pagehide', flushAutosave);
+window.addEventListener('beforeunload', flushAutosave);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') flushAutosave();
+});
 
 // ── Download helpers ────────────────────────────────────────────────────────
 function chartFileName(ext) {

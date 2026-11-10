@@ -32,6 +32,7 @@ window.addEventListener('resize', updateHeaderHeight);
 
 // ── Start ───────────────────────────────────────────────────────────────────
 lang = detectLanguage();
+restoreCalcState();
 applyTranslations();
 restoreAutosave();
 let savedTab = 'knit';
