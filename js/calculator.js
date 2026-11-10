@@ -77,6 +77,7 @@ function updateCalculator() {
     out('calcOptions').hidden = true;
     chosenSt = chosenRow = null;
     if (typeof updateEditorUI === 'function') updateEditorUI();
+    saveCalcState();
     return;
   }
 
@@ -100,8 +101,37 @@ function updateCalculator() {
   out('calcRealSize').textContent = `${fmtCm(stitches / (stG / 10))} × ${fmtCm(rows / (rowG / 10))} cm`;
   out('calcTotal').innerHTML = t('calcTotal').replace('{n}', `<strong>${fmtInt(stitches * rows)}</strong>`);
   if (typeof updateEditorUI === 'function') updateEditorUI();
+  saveCalcState();
 }
 
 calcIds.forEach(id => document.getElementById(id).addEventListener('input', () => {
   chosenSt = null; chosenRow = null; updateCalculator();
 }));
+
+// ── Remember calculator values (this browser only) ─────────────────────────
+const CALC_KEY = 'kph-calc';
+let calcRestoring = false;
+
+function saveCalcState() {
+  if (calcRestoring) return;
+  const values = {};
+  calcIds.forEach(id => values[id] = document.getElementById(id).value);
+  try {
+    localStorage.setItem(CALC_KEY, JSON.stringify({ values, knitMethod, chosenSt, chosenRow }));
+  } catch (e) { /* storage unavailable – values just won't be remembered */ }
+}
+
+function restoreCalcState() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(CALC_KEY) || 'null'); } catch (e) { saved = null; }
+  if (!saved || typeof saved.values !== 'object') return;
+  calcRestoring = true;
+  calcIds.forEach(id => {
+    const v = saved.values[id];
+    if (typeof v === 'string') document.getElementById(id).value = v;
+  });
+  if (saved.knitMethod === 'flat' || saved.knitMethod === 'round') setKnitMethod(saved.knitMethod);
+  chosenSt  = Number.isFinite(saved.chosenSt)  ? saved.chosenSt  : null;
+  chosenRow = Number.isFinite(saved.chosenRow) ? saved.chosenRow : null;
+  calcRestoring = false;
+}
