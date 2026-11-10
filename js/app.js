@@ -18,6 +18,8 @@ function setTab(tab) {
   updateHeaderHeight();
   // The tracker measures the image, so refresh it when it becomes visible again
   if (tab === 'knit' && document.getElementById('viewer').style.display === 'flex') updateHighlight();
+  // The editor canvas sizes itself to its container, which has no width while hidden
+  if (tab === 'design') drawEditor();
 }
 
 // Full-height views (rajaus, seuranta) fill the space below the header,

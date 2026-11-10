@@ -75,6 +75,8 @@ function updateCalculator() {
     ['calcStitches', 'calcRows', 'calcGridSize', 'calcRealSize'].forEach(id => out(id).textContent = '–');
     out('calcTotal').textContent = t('calcFillAll');
     out('calcOptions').hidden = true;
+    chosenSt = chosenRow = null;
+    if (typeof updateEditorUI === 'function') updateEditorUI();
     return;
   }
 
@@ -97,6 +99,7 @@ function updateCalculator() {
   out('calcGridSize').textContent = `${stitches} × ${rows}`;
   out('calcRealSize').textContent = `${fmtCm(stitches / (stG / 10))} × ${fmtCm(rows / (rowG / 10))} cm`;
   out('calcTotal').innerHTML = t('calcTotal').replace('{n}', `<strong>${fmtInt(stitches * rows)}</strong>`);
+  if (typeof updateEditorUI === 'function') updateEditorUI();
 }
 
 calcIds.forEach(id => document.getElementById(id).addEventListener('input', () => {

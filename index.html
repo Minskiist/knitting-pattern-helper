@@ -144,7 +144,7 @@
 
 <div class="tab-intro">
   <h2 data-i18n="designIntroTitle">Suunnittele oma neulekaavio</h2>
-  <p data-i18n="designIntroText">Mitoita kaavio neuletiheyden, tavoitemittojen ja kuviokerran mukaan.</p>
+  <p data-i18n="designIntroText">Mitoita kaavio laskimella ja piirrä se editorissa.</p>
 </div>
 
 <!-- ── Smart calculator ── -->
@@ -229,7 +229,48 @@
     </div>
   </div>
   <p class="calc-total" id="calcTotal"></p>
+  <button type="button" class="btn-primary calc-make" id="calcMakeChart" onclick="makeChartFromCalculator()" data-i18n="makeChart">Tee kaavio →</button>
   <p class="calc-note" data-i18n="calcNote">Muista, että kirjoneule ja palmikot joustavat vähemmän kuin sileä neulos. Tee mallitilkku samalla tekniikalla, jolla aiot neuloa.</p>
+</section>
+
+<!-- ── Chart editor ── -->
+<section class="editor-panel" id="editorPanel" aria-labelledby="editorTitle">
+  <h2 id="editorTitle" data-i18n="editorTitle">Kaavioeditori</h2>
+
+  <div class="ed-new">
+    <div class="calib-field">
+      <label for="edCols" data-i18n="stitchesLabel">Silmukoita:</label>
+      <input type="number" id="edCols" min="1" max="300" value="20" inputmode="numeric">
+    </div>
+    <div class="calib-field">
+      <label for="edRows" data-i18n="rowsLabel">Kerroksia:</label>
+      <input type="number" id="edRows" min="1" max="300" value="20" inputmode="numeric">
+    </div>
+    <button type="button" class="btn-small" onclick="createGridFromInputs()" data-i18n="edNewGrid">Luo uusi ruudukko</button>
+  </div>
+
+  <p class="ed-empty" id="edEmpty" data-i18n="edEmpty">Luo ruudukko yllä tai laskimen Tee kaavio -napilla.</p>
+
+  <div id="edWorkspace" hidden>
+    <div class="ed-toolbar">
+      <div class="ed-tools" role="group">
+        <button type="button" class="toggle-btn" id="edToolPaint" onclick="setEditorTool('paint')" data-i18n="edPaint">Maalaa</button>
+        <button type="button" class="toggle-btn" id="edToolFill" onclick="setEditorTool('fill')" data-i18n="edFill">Täytä alue</button>
+      </div>
+      <div class="ed-palette" id="edPalette" role="radiogroup"></div>
+      <div class="ed-actions">
+        <button type="button" class="btn-small" id="edUndo" onclick="undoEditor()" data-i18n="edUndo">↶ Kumoa</button>
+        <button type="button" class="btn-small" onclick="clearEditor()" data-i18n="edClear">Tyhjennä</button>
+      </div>
+    </div>
+    <div class="ed-status">
+      <span id="edSizeInfo"></span>
+      <span id="edCellInfo"></span>
+    </div>
+    <div class="ed-canvas-wrap" id="edCanvasWrap">
+      <canvas id="edCanvas"></canvas>
+    </div>
+  </div>
 </section>
 
 </main>
@@ -237,6 +278,7 @@
 <script src="js/i18n.js"></script>
 <script src="js/tracker.js"></script>
 <script src="js/calculator.js"></script>
+<script src="js/editor.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
