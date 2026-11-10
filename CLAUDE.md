@@ -13,12 +13,14 @@ js/i18n.js          I18N-sanakirja (FI + EN), t(), kielivalinta
 js/tracker.js       Neulo: lataus, rajaus, seuranta, näppäinkomennot
 js/calculator.js    Suunnittele: älykäs laskin
 js/editor.js        Suunnittele: kaavioeditori (canvas, värit, maalaus, täyttö, kumoa)
+js/chart-file.js    kaavion automaattinen tallennus selaimeen, vienti/tuonti (.json) ja PNG
 js/app.js           välilehdet ja käynnistys (ladataan viimeisenä)
 ```
 
 - Vanilla JS tavallisina `<script>`-tiedostoina (ei moduuleja, ei frameworkeja, ei build-vaihetta). Tiedostot jakavat globaalit muuttujat, joten latausjärjestys `index.html`:ssä on tärkeä.
 - Uusi iso osa saa oman tiedostonsa `js/`-kansioon.
 - Editorin data: `editor.cells[kerros * silmukat + silmukka]`, jossa silmukka 0 on **oikeanpuoleisin** ja kerros 0 **alin**. Piirrettäessä koordinaatit käännetään.
+- Kaaviotiedoston muoto on kuvattu `js/chart-file.js`:n alussa. Jos muoto muuttuu, nosta `version`-numeroa ja pidä vanhojen tiedostojen avaus toimivana.
 - Julkaisu: Netlify julkaisee `main`-haaran automaattisesti, ja jokaisesta PR:stä tulee Deploy Preview.
 
 ## Neulontakäytännöt (tärkeät)
