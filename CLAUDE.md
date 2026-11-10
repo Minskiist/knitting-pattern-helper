@@ -11,6 +11,7 @@ index.html          HTML-rakenne (ei tyylejä eikä skriptejä)
 css/styles.css      kaikki tyylit
 js/i18n.js          I18N-sanakirja (FI + EN), t(), kielivalinta
 js/tracker.js       Neulo: lataus, rajaus, seuranta, näppäinkomennot
+js/tracker-session.js  Neulo: muisti (kuva, rajaus, nykyinen kerros) IndexedDB:ssä
 js/calculator.js    Suunnittele: älykäs laskin
 js/editor.js        Suunnittele: kaavioeditori (canvas, värit, maalaus, täyttö, kumoa)
 js/chart-file.js    kaavion automaattinen tallennus selaimeen, vienti/tuonti (.json) ja PNG

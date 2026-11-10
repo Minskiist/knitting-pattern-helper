@@ -636,3 +636,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 .ed-save-status { font-size: 0.82rem; color: #4f7a52; }
 .ed-file-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+/* ── Resume previous chart ── */
+.resume-btn {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  white-space: normal;
+  text-align: center;
+}

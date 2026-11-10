@@ -67,6 +67,14 @@ function loadForCalibration() {
         fitCalibImage();
         initSelRect();
         updateDividers();
+        calibData = null;
+        saveTrackerSession({
+          image: imageDataUrl, fileName: file.name, direction,
+          calib: null, draft: selRectFractions(), currentRow: 0, stage: 'calib',
+          rows: Math.max(1, parseInt(document.getElementById('calibRowCount').value) || 20),
+          cols: Math.max(1, parseInt(document.getElementById('calibColCount').value) || 10),
+        });
+        updateResumeButton();
       });
     };
     calibImgEl.src = imageDataUrl;
@@ -183,7 +191,10 @@ function updateDividers() {
     applySelRect();
   }
 
-  function onEnd() { dragState = null; }
+  function onEnd() {
+    if (dragState) saveCalibDraft();
+    dragState = null;
+  }
 
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup',   onEnd);
@@ -208,9 +219,13 @@ function startKnitting() {
     wFrac: selRectPos.w / imgW,
     hFrac: selRectPos.h / imgH,
   };
-  totalRows  = Math.max(1, parseInt(document.getElementById('calibRowCount').value) || 20);
+  const newRows = Math.max(1, parseInt(document.getElementById('calibRowCount').value) || 20);
+  // Recalibrating the same chart keeps your place; a new chart starts from row 1
+  const keepRow = trackerSession && trackerSession.stage === 'calib' && trackerSession.calib;
+  currentRow = keepRow ? Math.min(currentRow, newRows - 1) : 0;
+  totalRows  = newRows;
   totalCols  = Math.max(1, parseInt(document.getElementById('calibColCount').value) || 10);
-  currentRow = 0;
+  saveTrackerSession({ calib: calibData, draft: null, rows: totalRows, cols: totalCols, currentRow, stage: 'knit' });
 
   chartImg.src      = imageDataUrl;
   chartImgSharp.src = imageDataUrl;
@@ -234,11 +249,14 @@ function backToSetup() {
   document.getElementById('calibPanel').style.display = 'none';
   document.getElementById('setupPanel').style.display = 'block';
   showKnitIntro(true);
+  if (trackerSession) saveTrackerSession({ stage: 'setup' });
+  updateResumeButton();
 }
 
 function backToCalib() {
   document.getElementById('viewer').style.display   = 'none';
   document.getElementById('calibPanel').style.display = 'flex';
+  saveTrackerSession({ stage: 'calib', draft: selRectFractions() });
 }
 
 // ── Zoom ──────────────────────────────────────────────────────────────────
@@ -394,11 +412,11 @@ function complementColor(r, g, b) {
 
 // ── Navigation ────────────────────────────────────────────────────────────
 function nextRow() {
-  if (currentRow < totalRows - 1) { currentRow++; updateHighlight(); scrollToRow(); }
+  if (currentRow < totalRows - 1) { currentRow++; updateHighlight(); scrollToRow(); saveTrackerSession({ currentRow }); }
 }
 
 function prevRow() {
-  if (currentRow > 0) { currentRow--; updateHighlight(); scrollToRow(); }
+  if (currentRow > 0) { currentRow--; updateHighlight(); scrollToRow(); saveTrackerSession({ currentRow }); }
 }
 
 function scrollToRow() {
