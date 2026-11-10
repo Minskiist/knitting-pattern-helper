@@ -32,7 +32,17 @@ header h1 { font-size: 1.3rem; }
 .tab:hover { background: rgba(255,255,255,0.12); color: white; opacity: 1; }
 .tab.active { background: rgba(255,255,255,0.2); color: white; }
 .tab:focus-visible, .lang-btn:focus-visible { outline: 2px solid white; outline-offset: 2px; }
-#tabDesign { padding-top: 2.5rem; }
+#tabDesign { padding-top: 0; }
+
+/* ── Tab intro ── */
+.tab-intro {
+  max-width: 480px;
+  margin: 2rem auto 1.25rem;
+  padding: 0 0.25rem;
+}
+.tab-intro h2 { font-size: 1.45rem; color: #5a3d56; margin-bottom: 0.3rem; }
+.tab-intro p { font-size: 0.95rem; color: #666; line-height: 1.5; }
+@media (max-width: 520px) { .tab-intro { margin-left: 1rem; margin-right: 1rem; } }
 @media (max-width: 560px) {
   header { flex-wrap: wrap; row-gap: 0.5rem; }
   .tabs { order: 3; width: 100%; margin: 0; }
@@ -102,7 +112,7 @@ header h1 { font-size: 1.3rem; }
 /* ── Setup panel ── */
 .setup-panel {
   max-width: 480px;
-  margin: 2.5rem auto;
+  margin: 1.25rem auto 2.5rem;
   background: white;
   border-radius: 12px;
   padding: 2rem;
@@ -455,7 +465,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .welcome {
   position: relative;
   max-width: 480px;
-  margin: 1.5rem auto 0;
+  margin: 0 auto;
   background: #f0eaf4;
   border: 1px solid #d4c0d0;
   border-radius: 10px;
@@ -548,7 +558,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   line-height: 1.5;
 }
 @media (max-width: 420px) {
-  .setup-panel, .calc-panel { padding: 1.25rem; margin-left: 1rem; margin-right: 1rem; }
+  .setup-panel, .calc-panel, .welcome { margin-left: 1rem; margin-right: 1rem; }
+  .setup-panel, .calc-panel { padding: 1.25rem; }
   .calc-result-value { font-size: 1.2rem; }
 }
   
